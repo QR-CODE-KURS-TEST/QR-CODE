@@ -8,7 +8,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -40,12 +39,10 @@ export function UserMenu({
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel className="grid gap-0.5">
+        <div className="grid gap-0.5 px-1.5 py-1">
           <span className="truncate text-sm font-medium">{name ?? "Konto"}</span>
-          <span className="truncate text-xs font-normal text-muted-foreground">
-            {email}
-          </span>
-        </DropdownMenuLabel>
+          <span className="truncate text-xs text-muted-foreground">{email}</span>
+        </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem render={<Link href="/app/settings" />}>
           <Settings className="size-4" />
