@@ -23,15 +23,23 @@ const bricolage = Bricolage_Grotesque({
 const description =
   "Designe QR-Codes, kürze und tracke Links und sieh in Echtzeit, wer scannt. Jetzt kostenlos starten.";
 
+function resolveSiteUrl(): string {
+  let url = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  if (!/^https?:\/\//i.test(url)) url = `https://${url}`;
+  try {
+    return new URL(url).toString();
+  } catch {
+    return "http://localhost:3000";
+  }
+}
+
 export const metadata: Metadata = {
   title: {
     default: `${APP_NAME} — ${APP_TAGLINE}`,
     template: `%s · ${APP_NAME}`,
   },
   description,
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
-  ),
+  metadataBase: new URL(resolveSiteUrl()),
   applicationName: APP_NAME,
   keywords: [
     "QR-Code",
