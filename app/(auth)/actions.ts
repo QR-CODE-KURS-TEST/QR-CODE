@@ -23,13 +23,16 @@ export async function signInWithPassword(
   const password = String(formData.get("password") ?? "");
   const redirectTo = String(formData.get("redirect") ?? "/app");
 
-  const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-
-  if (error) return { error: "E-Mail oder Passwort ist falsch." };
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) return { error: "E-Mail oder Passwort ist falsch." };
+  } catch (e) {
+    return { error: `Anmeldung fehlgeschlagen: ${(e as Error).message}` };
+  }
 
   revalidatePath("/", "layout");
-  redirect(redirectTo);
+  redirect(redirectTo); // außerhalb try/catch – redirect() wirft intern NEXT_REDIRECT
 }
 
 export async function signUpWithPassword(
@@ -43,19 +46,22 @@ export async function signUpWithPassword(
   if (password.length < 8)
     return { error: "Das Passwort muss mindestens 8 Zeichen haben." };
 
-  const supabase = await createClient();
-  const { error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: { full_name: fullName },
-      emailRedirectTo: `${await siteUrl()}/auth/callback`,
-    },
-  });
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: fullName },
+        emailRedirectTo: `${await siteUrl()}/auth/callback`,
+      },
+    });
+    if (error) return { error: error.message };
+  } catch (e) {
+    return { error: `Registrierung fehlgeschlagen: ${(e as Error).message}` };
+  }
 
-  if (error) return { error: error.message };
-
-  redirect("/signup/check-email");
+  redirect("/signup/check-email"); // außerhalb try/catch
 }
 
 async function signInWithOAuth(provider: "google" | "apple") {
